@@ -8,5 +8,23 @@
 
 import Foundation
 
-print("Hello, World!")
+enum Argument:String {
+    case install = "install"
+}
+
+for i in 1..<CommandLine.arguments.count {
+    let argument = CommandLine.arguments[i]
+    switch argument {
+    case Argument.install.rawValue:
+        if Settings.shared.install() {
+            print("Success!")
+        } else {
+            print("Something went wrong. I can't  initiate the tool. Try to start 'install' process again.")
+        }
+        break
+    default:
+        break
+    }
+}
+
 
