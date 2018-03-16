@@ -27,4 +27,7 @@ for i in 1..<CommandLine.arguments.count {
     }
 }
 
+if Settings.shared.isLoggedIn {
+    
+}
 

@@ -8,50 +8,96 @@
 
 import Cocoa
 
-class Message {
-    var text:String = ""
-    var response:String = ""
-    var isPassword:Bool = false
-    
-    required init(_ text:String, _ isPassword:Bool = false) {
-        self.text = text
-        self.isPassword = isPassword
-    }
-}
-
 class Settings {
     static let shared:Settings = Settings()
     
-    private var host:String = ""
-    private var user:String = ""
-    private var pass:String = ""
+    var host:String = ""
+    var user:String = ""
+    var pass:String = ""
     
-    func install() -> Bool {
-        let messages = [Message("Please, enter your JIRA's host:"), Message("Now, please, enter your jira login:"), Message("And password, please:", true)]
-        for message in messages {
-            userInputFor(message: message)
+    var isLoggedIn:Bool {
+        get {
+            return host != "" && user != "" && pass != ""
         }
-        print("Host: \(messages[0].response)")
-        print("Login: \(messages[1].response)")
-        print("Pass: \(messages[2].response)")
-        return true
     }
     
-    private func userInputFor(message:Message) {
-        if message.isPassword {
-            message.response = enterPass(message: message.text)
+    private var homeDirURL:URL {
+        get {
+            var url = FileManager.default.homeDirectoryForCurrentUser
+            url.appendPathComponent(".zira", isDirectory: true)
+            
+            if !FileManager.default.fileExists(atPath: url.absoluteString, isDirectory: nil) {
+                do {
+                    try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+                } catch {
+                    print("Something bad happens. I cant create my own directory to store your settings")
+                }
+            }
+            
+            url.appendPathComponent("settings", isDirectory: false)
+            
+            return url
+        }
+    }
+    
+    required init() {
+        
+        if !FileManager.default.fileExists(atPath: self.homeDirURL.relativePath) {
             return
         }
-        print(message.text)
+        
+        do {
+            let data = try Data(contentsOf: self.homeDirURL)
+            guard   let dict:[String:String] = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String:String],
+                    var host = dict["host"],
+                    let user = dict["user"],
+                    let pass = dict["pass"] else {
+                        print("Sorry, but I can't read settings file")
+                        return
+            }
+            if !host.hasPrefix("http") {
+                host = "http://\(host)"
+            }
+            self.host = host
+            self.user = user
+            self.pass = pass
+        } catch {
+            print("Sorry, but I can't read settings file")
+        }
+    }
+    
+    func install() -> Bool {
+        self.host = userInputFor(message: "Please, enter your JIRA's host:")
+        self.user = userInputFor(message: "Now, please, enter your jira login:")
+        self.pass = userInputFor(message: "And password, please:", isPassword: true)
+        
+        return save()
+    }
+    
+    private func save() -> Bool {
+        let dict:[String:String] = ["host": self.host, "user": self.user, "pass": self.pass]
+        do {
+            let data = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
+            try data.write(to: self.homeDirURL)
+            return true
+        } catch {
+            print("can't save local settings")
+            return false
+        }
+    }
+    
+    private func userInputFor(message:String, isPassword:Bool = false) -> String{
+        if isPassword {
+            return enterPass(message: message)
+        }
+        print(message)
         if let response = readLine() {
             print("Your entered: \(response), are you sure? y/n: ")
             if let sure = readLine() {
                 if sure.lowercased() == "y" {
-                    message.response = response
-                    return
+                    return response
                 } else {
-                    userInputFor(message:message)
-                    return
+                    return userInputFor(message:message, isPassword: isPassword)
                 }
             }
         }

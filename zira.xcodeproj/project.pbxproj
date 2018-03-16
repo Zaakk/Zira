@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		BC10362E205BC8BE002B75BE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC10362D205BC8BE002B75BE /* main.swift */; };
 		BC103635205BF46B002B75BE /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC103634205BF46B002B75BE /* Settings.swift */; };
+		BC103637205C2F00002B75BE /* Net.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC103636205C2F00002B75BE /* Net.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,6 +28,7 @@
 		BC10362A205BC8BE002B75BE /* zira */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zira; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC10362D205BC8BE002B75BE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		BC103634205BF46B002B75BE /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		BC103636205C2F00002B75BE /* Net.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Net.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 			children = (
 				BC10362D205BC8BE002B75BE /* main.swift */,
 				BC103634205BF46B002B75BE /* Settings.swift */,
+				BC103636205C2F00002B75BE /* Net.swift */,
 			);
 			path = zira;
 			sourceTree = "<group>";
@@ -124,6 +127,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BC103635205BF46B002B75BE /* Settings.swift in Sources */,
+				BC103637205C2F00002B75BE /* Net.swift in Sources */,
 				BC10362E205BC8BE002B75BE /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
