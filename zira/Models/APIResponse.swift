@@ -13,3 +13,4 @@ class APIResponse: Codable {
     let key:String
     let `self`:String
 }
+

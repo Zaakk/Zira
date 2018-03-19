@@ -58,6 +58,9 @@ class Settings {
             if !host.hasPrefix("http") {
                 host = "http://\(host)"
             }
+            if !host.hasSuffix("/") {
+                host = "\(host)/"
+            }
             self.host = host
             self.user = user
             self.pass = pass
@@ -75,6 +78,8 @@ class Settings {
     }
     
     private func save() -> Bool {
+        
+//        let (data, response, error) = Net.load(request: nil)
         let dict:[String:String] = ["host": self.host, "user": self.user, "pass": self.pass]
         do {
             let data = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)

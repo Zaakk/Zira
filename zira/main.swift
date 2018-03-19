@@ -11,6 +11,7 @@ import Foundation
 enum Argument:String {
     case install = "install"
     case createIssue = "createIssue"
+    case createSubtask = "createSubtask"
 }
 
 func help() {
@@ -68,16 +69,24 @@ case Argument.createIssue.rawValue:
     guard   let summary = arguments[kSummaryArgKey],
             let description = arguments[kDescriptionArgKey],
             let project = arguments[kProjectArgKey],
-            let type = arguments[kIssueTypeArgKey],
-            let issueType = IssueType(rawValue: type) else {
+            let type = arguments[kIssueTypeArgKey] else {
         invalidArguments()
         exit(0)
     }
-    guard let result = Net.createIssue(summary: summary, description: description, project: project, type: issueType) else {
+    let subtaskKey = [kSubtaskNameArgKey]
+    let subtaskArgument = argumentsParsing(argumentNames: subtaskKey)
+    let subtask = subtaskArgument[kSubtaskNameArgKey]
+    let (result, data) = Net.createIssue(summary: summary, description: description, project: project, type: type, subtask: subtask)
+    guard let res = result else {
         print("Something went wrong, I can't parse JIRA's response :(")
+        guard let d = data else {
+            exit(0)
+        }
+        print("data:")
+        print("\(String(data: d, encoding: .utf8) ?? "No data")")
         exit(0)
     }
-    print("Success!\nThere was created an issue.\n\n\(Settings.shared.host)browse/\(result.key)\n\n")
+    print("Success!\nThere was created an issue.\n\n\(Settings.shared.host)browse/\(res.key)\n\n")
     break
 default:
     break
