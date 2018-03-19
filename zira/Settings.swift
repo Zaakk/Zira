@@ -96,9 +96,8 @@ class Settings {
             if let sure = readLine() {
                 if sure.lowercased() == "y" {
                     return response
-                } else {
-                    return userInputFor(message:message, isPassword: isPassword)
                 }
+                return userInputFor(message:message, isPassword: isPassword)
             }
         }
         print("Nothing :(")
@@ -114,9 +113,8 @@ class Settings {
             }
             if passwordStr == enterPass(message: "Please, repeat: ", isRepeat: true) {
                 return passwordStr
-            } else {
-                return enterPass(message: message)
             }
+            return enterPass(message: message)
         } else {
             print("Something went wrong, please repeat")
             return enterPass(message: message)
