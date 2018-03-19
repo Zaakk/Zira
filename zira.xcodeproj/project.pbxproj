@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		BC014DAC205FEF5500412EF9 /* APIResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC014DAB205FEF5500412EF9 /* APIResponse.swift */; };
+		BC014DAE2060110500412EF9 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC014DAD2060110500412EF9 /* Constants.swift */; };
 		BC10362E205BC8BE002B75BE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC10362D205BC8BE002B75BE /* main.swift */; };
 		BC103635205BF46B002B75BE /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC103634205BF46B002B75BE /* Settings.swift */; };
 		BC103637205C2F00002B75BE /* Net.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC103636205C2F00002B75BE /* Net.swift */; };
@@ -27,6 +28,7 @@
 
 /* Begin PBXFileReference section */
 		BC014DAB205FEF5500412EF9 /* APIResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIResponse.swift; sourceTree = "<group>"; };
+		BC014DAD2060110500412EF9 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		BC10362A205BC8BE002B75BE /* zira */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zira; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC10362D205BC8BE002B75BE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		BC103634205BF46B002B75BE /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
@@ -67,6 +69,7 @@
 				BC103634205BF46B002B75BE /* Settings.swift */,
 				BC103636205C2F00002B75BE /* Net.swift */,
 				BC014DAB205FEF5500412EF9 /* APIResponse.swift */,
+				BC014DAD2060110500412EF9 /* Constants.swift */,
 			);
 			path = zira;
 			sourceTree = "<group>";
@@ -129,6 +132,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC014DAE2060110500412EF9 /* Constants.swift in Sources */,
 				BC103635205BF46B002B75BE /* Settings.swift in Sources */,
 				BC014DAC205FEF5500412EF9 /* APIResponse.swift in Sources */,
 				BC103637205C2F00002B75BE /* Net.swift in Sources */,

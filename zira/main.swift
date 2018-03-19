@@ -14,7 +14,30 @@ enum Argument:String {
 }
 
 func help() {
-    
+    print("-------------------\nThis is a simple, easy-to-use tool for JIRA.\nThe tool based on JIRA REST API and fully written on Swift\n-------------------")
+}
+
+func invalidArguments() {
+    help()
+    print("\nThere is wrong number of arguments. Check arguments are correct or not.")
+    exit(0)
+}
+
+func argumentsParsing(argumentNames:[String]) -> [String:String] {
+    var values:[String:String] = [:]
+    for name in argumentNames {
+        if CommandLine.arguments.contains(name) {
+            guard let argcIndex = CommandLine.arguments.index(of: name) else {
+                continue
+            }
+            let argvIndex = argcIndex + 1
+            if CommandLine.arguments.count <= argvIndex {
+                continue
+            }
+            values[name] = CommandLine.arguments[argvIndex]
+        }
+    }
+    return values
 }
 
 if CommandLine.arguments.count == 1 {
@@ -37,15 +60,27 @@ case Argument.createIssue.rawValue:
         print("You are not logged in. Enter 'zira install' and walk through install process.")
         break
     }
-    Net.createIssue(summary: "from CLI", description: "description from CLI call", project: "TEST", type: .bug)
+    let argumentNames = [kSummaryArgKey, kDescriptionArgKey, kProjectArgKey, kIssueTypeArgKey]
+    let arguments = argumentsParsing(argumentNames: argumentNames)
+    if arguments.count != argumentNames.count {
+        invalidArguments()
+    }
+    guard   let summary = arguments[kSummaryArgKey],
+            let description = arguments[kDescriptionArgKey],
+            let project = arguments[kProjectArgKey],
+            let type = arguments[kIssueTypeArgKey],
+            let issueType = IssueType(rawValue: type) else {
+        invalidArguments()
+        exit(0)
+    }
+    guard let result = Net.createIssue(summary: summary, description: description, project: project, type: issueType) else {
+        print("Something went wrong, I can't parse JIRA's response :(")
+        exit(0)
+    }
+    print("Success!\nThere was created an issue.\n\n\(Settings.shared.host)browse/\(result.key)\n\n")
     break
 default:
     break
-}
-
-for i in 1..<CommandLine.arguments.count {
-    let argument = CommandLine.arguments[i]
-    
 }
 
 

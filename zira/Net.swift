@@ -21,7 +21,7 @@ enum IssueType:String {
 
 class Net: NSObject {
     
-    static func createIssue(summary:String, description:String, project:String, type:IssueType) {
+    static func createIssue(summary:String, description:String, project:String, type:IssueType) -> APIResponse? {
         let url = "\(Settings.shared.host)\(kIssueEndpoint)"
         
         let payload:[String:Any] =   [
@@ -43,15 +43,14 @@ class Net: NSObject {
             exit(0)
         }
         guard let responseData = data else {
-            return
+            return nil
         }
         
         do {
             let result = try JSONDecoder().decode(APIResponse.self, from: responseData)
-            print("\(result)")
+            return result
         } catch {
-            print("Something went wrong, I can't parse JIRA's response :(")
-            exit(0)
+            return nil
         }
         
     }
