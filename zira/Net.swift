@@ -11,6 +11,7 @@ import Cocoa
 let kTimeoutInterval:TimeInterval = 20.0
 let kAPIVersion = 2
 let kIssueEndpoint = "rest/api/\(kAPIVersion)/issue"
+let kMetaEndpoint = "rest/api/\(kAPIVersion)/issue/createmeta"
 
 
 class Net: NSObject {
@@ -81,7 +82,6 @@ class Net: NSObject {
     
     static func syncLoad(url:String, payload:[String:Any]) -> (Data?, URLResponse?, Error?) {
         guard let url = URL(string: url) else {
-            self.triggerNetworkExit()
             return (nil, nil, nil)
         }
         
@@ -89,7 +89,7 @@ class Net: NSObject {
         do {
             postData = try JSONSerialization.data(withJSONObject: payload, options: [])
         } catch {
-            self.triggerNetworkExit()
+            return (nil, nil, nil)
         }
         
         let request = NSMutableURLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: kTimeoutInterval)
@@ -119,9 +119,26 @@ class Net: NSObject {
         return (dataResp, serverResponse, errorResp)
     }
     
-    private static func triggerNetworkExit() {
-        print("Incorrect network request. Hmm, try to check all parameters.")
-        exit(0)
+    static func loadProjects() -> Meta? {
+        let urlStr = "\(Settings.shared.host)\(kMetaEndpoint)"
+        guard let url = URL(string: urlStr) else {
+            return nil
+        }
+        let request = NSMutableURLRequest(url: url)
+        request.allHTTPHeaderFields = self.headers()
+        let (data, _, error) = load(request: request)
+        if error != nil {
+            return nil
+        }
+        guard let d = data else {
+            return nil
+        }
+        do {
+            let meta = try JSONDecoder().decode(Meta.self, from: d)
+            return meta
+        } catch {
+            return nil
+        }
     }
     
 }

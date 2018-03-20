@@ -8,12 +8,13 @@
 
 import Cocoa
 
-class Settings {
+class Settings:Codable {
     static let shared:Settings = Settings()
     
     var host:String = ""
     var user:String = ""
     var pass:String = ""
+    var project:Project?
     
     var isLoggedIn:Bool {
         get {
@@ -48,47 +49,57 @@ class Settings {
         
         do {
             let data = try Data(contentsOf: self.homeDirURL)
-            guard   let dict:[String:String] = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String:String],
-                    var host = dict["host"],
-                    let user = dict["user"],
-                    let pass = dict["pass"] else {
-                        print("Sorry, but I can't read settings file")
-                        return
-            }
-            if !host.hasPrefix("http") {
-                host = "http://\(host)"
-            }
-            if !host.hasSuffix("/") {
-                host = "\(host)/"
-            }
-            self.host = host
-            self.user = user
-            self.pass = pass
+            let settings = try JSONDecoder().decode(Settings.self, from: data)
+            self.host = settings.host
+            self.user = settings.user
+            self.pass = settings.pass
+            self.project = settings.project
         } catch {
             print("Sorry, but I can't read settings file")
         }
     }
     
     func install() -> Bool {
-        self.host = userInputFor(message: "Please, enter your JIRA's host:")
-        self.user = userInputFor(message: "Now, please, enter your jira login:")
-        self.pass = userInputFor(message: "And password, please:", isPassword: true)
+        host = userInputFor(message: "Please, enter your JIRA's host:")
+        user = userInputFor(message: "Now, please, enter your jira login:")
+        pass = userInputFor(message: "And password, please:", isPassword: true)
+        
+        if !host.hasPrefix("http") {
+            host = "http://\(host)"
+        }
+        if !host.hasSuffix("/") {
+            host = "\(host)/"
+        }
+        
+        guard let meta:Meta = Net.loadProjects() else {
+            host = ""
+            user = ""
+            pass = ""
+            return false
+        }
+        
+        self.project = selectProject(projects: meta.projects)
         
         return save()
     }
     
-    private func save() -> Bool {
-        
-//        let (data, response, error) = Net.load(request: nil)
-        let dict:[String:String] = ["host": self.host, "user": self.user, "pass": self.pass]
-        do {
-            let data = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
-            try data.write(to: self.homeDirURL)
-            return true
-        } catch {
-            print("can't save local settings")
-            return false
+    private func selectProject(projects:[Project]) -> Project {
+        print("Select project, type number:")
+        var counter = 1
+        for project in projects {
+            print(" – \(project.name) (\(counter))")
+            counter += 1
         }
+        print("------\nYou will be able to change current project at any time.")
+        guard let response:String = readLine(), var enteredNumber = Int(response) else {
+            print("You entered incorrect value. Try again, pleease.")
+            return selectProject(projects:projects)
+        }
+        enteredNumber -= 1
+        if enteredNumber >= counter {
+            print("You entered incorrect number. Try again, pleease.")
+        }
+        return projects[enteredNumber]
     }
     
     private func userInputFor(message:String, isPassword:Bool = false) -> String{
@@ -123,6 +134,17 @@ class Settings {
         } else {
             print("Something went wrong, please repeat")
             return enterPass(message: message)
+        }
+    }
+    
+    private func save() -> Bool {
+        do {
+            let data = try JSONEncoder().encode(self)
+            try data.write(to: self.homeDirURL)
+            return true
+        } catch {
+            print("can't save local settings")
+            return false
         }
     }
 }
