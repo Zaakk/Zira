@@ -16,37 +16,34 @@ let kMetaEndpoint = "rest/api/\(kAPIVersion)/issue/createmeta"
 
 class Net: NSObject {
     
-    static func createIssue(summary:String, description:String, project:String, type:String, subtask:String?) -> (APIResponse?, Data?) {
+    static func createIssue(summary:String, description:String, type:String?, parent:String?) -> (APIResponse?, Data?) {
         let url = "\(Settings.shared.host)\(kIssueEndpoint)"
+        
+        guard let issueType = handleIssueType(type: type, isSubtask: parent != nil) else {
+            return (nil, nil)
+        }
         
         var payload:[String:Any] =   [
                             "fields": [
                                 "project": [
-                                    "key": project
+                                    "key": Settings.shared.project?.key
                                 ],
                                 "summary": summary,
                                 "description": description,
                                 "issuetype": [
-                                    "name": type
+                                    "name": issueType
                                 ]
                             ]
                         ]
         
-        if subtask != nil {
+        if parent != nil {
             var fields:[String:Any] = payload["fields"] as! [String:Any]
-            fields["parent"] = ["key": subtask!]
-            
-            var issuetype:[String:String] = fields["issuetype"] as! [String:String]
-            issuetype["name"] = "Sub-task"
-            fields["issuetype"] = issuetype
-            
+            fields["parent"] = ["key": parent!]
             payload["fields"] = fields
         }
-        print("\(payload)")
         let (data, _, error) = self.syncLoad(url: url, payload: payload)
         if (error != nil) {
-            print("\(String(describing: error))")
-            exit(0)
+            return (nil, data)
         }
         guard let responseData = data else {
             return (nil, nil)
@@ -139,6 +136,26 @@ class Net: NSObject {
         } catch {
             return nil
         }
+    }
+    
+    private static func handleIssueType(type:String?, isSubtask:Bool) -> String? {
+        guard let project = Settings.shared.project else {
+            return nil
+        }
+        
+        let issueTypes:[IssueType] = project.issuetypes
+        
+        if type == nil {
+            return issueTypes.first?.name
+        }
+        
+        for issueType in issueTypes {
+            if type == issueType.name && issueType.subtask == isSubtask {
+                return type
+            }
+        }
+        
+        return nil
     }
     
 }

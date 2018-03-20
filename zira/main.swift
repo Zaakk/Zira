@@ -12,6 +12,7 @@ enum Argument:String {
     case install = "install"
     case createIssue = "createIssue"
     case createSubtask = "createSubtask"
+    case issuetypes = "issuetypes"
 }
 
 func help() {
@@ -22,6 +23,13 @@ func invalidArguments() {
     help()
     print("\nThere is wrong number of arguments. Check arguments are correct or not.")
     exit(0)
+}
+
+func checkLogin() {
+    if (!Settings.shared.isLoggedIn) {
+        print("You are not logged in. Enter 'zira install' and walk through install process.")
+        exit(0)
+    }
 }
 
 func argumentsParsing(argumentNames:[String]) -> [String:String] {
@@ -56,29 +64,35 @@ case Argument.install.rawValue:
         print("Something went wrong. I can't  initiate the tool. Try to start 'install' process again.")
     }
     break
+case Argument.issuetypes.rawValue:
+    checkLogin()
+    
+    guard let project = Settings.shared.project else {
+        print("Something went wrong, I can't find current project so you will be logout and you have to use `zira install` again. Sorry but it's necessary :(")
+        Settings.shared.logout()
+        exit(0)
+    }
+    
+    print("Issue types for current project:")
+    for issueType in project.issuetypes {
+        print(" – Name: `\(issueType.name)` is it subtask type: \(issueType.subtask ? "yes" : "no")")
+    }
+    break
 case Argument.createIssue.rawValue:
-    if (!Settings.shared.isLoggedIn) {
-        print("You are not logged in. Enter 'zira install' and walk through install process.")
-        break
-    }
-    let argumentNames = [kSummaryArgKey, kDescriptionArgKey, kProjectArgKey, kIssueTypeArgKey]
+    checkLogin()
+    let argumentNames = [kSummaryArgKey, kDescriptionArgKey, kIssueTypeArgKey, kParentNameArgKey]
     let arguments = argumentsParsing(argumentNames: argumentNames)
-    if arguments.count != argumentNames.count {
-        invalidArguments()
-    }
     guard   let summary = arguments[kSummaryArgKey],
-            let description = arguments[kDescriptionArgKey],
-            let project = arguments[kProjectArgKey],
-            let type = arguments[kIssueTypeArgKey] else {
+            let description = arguments[kDescriptionArgKey] else {
         invalidArguments()
         exit(0)
     }
-    let subtaskKey = [kSubtaskNameArgKey]
-    let subtaskArgument = argumentsParsing(argumentNames: subtaskKey)
-    let subtask = subtaskArgument[kSubtaskNameArgKey]
-    let (result, data) = Net.createIssue(summary: summary, description: description, project: project, type: type, subtask: subtask)
+    let type = arguments[kIssueTypeArgKey]
+    let parent = arguments[kParentNameArgKey]
+    let (result, data) = Net.createIssue(summary: summary, description: description, type: type, parent: parent)
     guard let res = result else {
-        print("Something went wrong, I can't parse JIRA's response :(")
+        print("Something went wrong.")
+        print("Try to check entered issue type.\nAlso you should be ensure that you entered correct issue type if you want to create subtask.\nYou can list all availables issue types for current project by command `zira issuetypes`")
         guard let d = data else {
             exit(0)
         }

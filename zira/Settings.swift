@@ -72,9 +72,7 @@ class Settings:Codable {
         }
         
         guard let meta:Meta = Net.loadProjects() else {
-            host = ""
-            user = ""
-            pass = ""
+            logout()
             return false
         }
         
@@ -83,21 +81,29 @@ class Settings:Codable {
         return save()
     }
     
+    func logout() {
+        host = ""
+        user = ""
+        pass = ""
+        project = nil
+    }
+    
     private func selectProject(projects:[Project]) -> Project {
         print("Select project, type number:")
-        var counter = 1
+        var counter = 0
         for project in projects {
-            print(" – \(project.name) (\(counter))")
             counter += 1
+            print(" – \(project.name) (\(counter))")
         }
         print("------\nYou will be able to change current project at any time.")
         guard let response:String = readLine(), var enteredNumber = Int(response) else {
             print("You entered incorrect value. Try again, pleease.")
             return selectProject(projects:projects)
         }
-        enteredNumber -= 1
-        if enteredNumber >= counter {
+        enteredNumber -= 1 // because user is entering value that starts from 1
+        if enteredNumber >= projects.count || enteredNumber < 0 {
             print("You entered incorrect number. Try again, pleease.")
+            return selectProject(projects: projects)
         }
         return projects[enteredNumber]
     }
