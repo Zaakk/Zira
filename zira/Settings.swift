@@ -6,7 +6,7 @@
 //  Copyright © 2018 Zaakk. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 class Settings:Codable {
     static let shared:Settings = Settings()
@@ -15,6 +15,7 @@ class Settings:Codable {
     var user:String = ""
     var pass:String = ""
     var project:Project?
+    var statuses:[Status] = []
     
     var isLoggedIn:Bool {
         get {
@@ -54,6 +55,7 @@ class Settings:Codable {
             self.user = settings.user
             self.pass = settings.pass
             self.project = settings.project
+            self.statuses = settings.statuses
         } catch {
             print("Sorry, but I can't read settings file")
         }
@@ -71,12 +73,23 @@ class Settings:Codable {
             host = "\(host)/"
         }
         
-        guard let meta:Meta = Net.loadProjects() else {
+        guard let meta:Meta = Net.loadMeta("\(Settings.shared.host)\(kMetaEndpoint)") else {
             logout()
             return false
         }
         
         self.project = selectProject(projects: meta.projects)
+        
+        guard let loadedStatuses:[Status] = Net.loadMeta("\(Settings.shared.host)\(kIssueStatusesEndpoint)") else {
+            return false
+        }
+        
+        statuses = loadedStatuses
+        
+        print("Just FYI. Available issue statuses:")
+        for status in statuses {
+            print(" – \(status.name)")
+        }
         
         return save()
     }

@@ -6,8 +6,6 @@
 //  Copyright © 2018 Zaakk. All rights reserved.
 //
 
-import Cocoa
-
 struct Project: Codable {
     let `self`:String
     let id:String

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		37B2E9F12062770200043AC8 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B2E9F02062770200043AC8 /* Status.swift */; };
+		37B2E9F520629EF400043AC8 /* IssueStatuses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B2E9F420629EF400043AC8 /* IssueStatuses.swift */; };
 		BC014DAE2060110500412EF9 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC014DAD2060110500412EF9 /* Constants.swift */; };
 		BC014DB32060319100412EF9 /* Meta.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC014DB22060319100412EF9 /* Meta.swift */; };
 		BC014DB5206031A100412EF9 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC014DB4206031A100412EF9 /* Project.swift */; };
@@ -30,6 +32,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		37B2E9F02062770200043AC8 /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
+		37B2E9F420629EF400043AC8 /* IssueStatuses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IssueStatuses.swift; sourceTree = "<group>"; };
 		BC014DAD2060110500412EF9 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		BC014DB22060319100412EF9 /* Meta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meta.swift; sourceTree = "<group>"; };
 		BC014DB4206031A100412EF9 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
@@ -59,6 +63,8 @@
 				BC014DB4206031A100412EF9 /* Project.swift */,
 				BC014DB6206031F700412EF9 /* IssueType.swift */,
 				BC014DB82060415200412EF9 /* APIResponse.swift */,
+				37B2E9F02062770200043AC8 /* Status.swift */,
+				37B2E9F420629EF400043AC8 /* IssueStatuses.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -154,7 +160,9 @@
 				BC014DB32060319100412EF9 /* Meta.swift in Sources */,
 				BC103637205C2F00002B75BE /* Net.swift in Sources */,
 				BC014DB7206031F700412EF9 /* IssueType.swift in Sources */,
+				37B2E9F12062770200043AC8 /* Status.swift in Sources */,
 				BC014DB92060415200412EF9 /* APIResponse.swift in Sources */,
+				37B2E9F520629EF400043AC8 /* IssueStatuses.swift in Sources */,
 				BC014DB5206031A100412EF9 /* Project.swift in Sources */,
 				BC10362E205BC8BE002B75BE /* main.swift in Sources */,
 			);

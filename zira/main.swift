@@ -12,7 +12,9 @@ enum Argument:String {
     case install = "install"
     case createIssue = "createIssue"
     case createSubtask = "createSubtask"
-    case issuetypes = "issuetypes"
+    case issueTypes = "issueTypes"
+    case issueStatuses = "issueStatuses"
+    case editIssue = "editIssue"
 }
 
 func help() {
@@ -64,7 +66,32 @@ case Argument.install.rawValue:
         print("Something went wrong. I can't  initiate the tool. Try to start 'install' process again.")
     }
     break
-case Argument.issuetypes.rawValue:
+case Argument.editIssue.rawValue:
+    checkLogin()
+    let argumentNames = [kIssueArgKey, kIssueStatusArgKey]
+    let arguments = argumentsParsing(argumentNames: argumentNames)
+    guard   let issue = arguments[kIssueArgKey],
+            let status = arguments[kIssueStatusArgKey] else {
+            invalidArguments()
+            exit(0)
+    }
+    if !Net.editIssue(issue: issue, status: status) {
+        print("Something went wrong.")
+        print("Try to check entered issue type.\nAlso you should be ensure that you entered correct issue type if you want to create subtask.\nYou can list all availables issue types for current project by command `zira issuetypes`")
+        exit(0)
+    }
+    print("Success!\nThe issue has been edited\n\n")
+    break
+case Argument.issueStatuses.rawValue:
+    checkLogin()
+    
+    print("Available issue statuses:")
+    for status in Settings.shared.statuses {
+        print(" – \(status.name)")
+    }
+    
+    break
+case Argument.issueTypes.rawValue:
     checkLogin()
     
     guard let project = Settings.shared.project else {
@@ -89,18 +116,13 @@ case Argument.createIssue.rawValue:
     }
     let type = arguments[kIssueTypeArgKey]
     let parent = arguments[kParentNameArgKey]
-    let (result, data) = Net.createIssue(summary: summary, description: description, type: type, parent: parent)
+    let result = Net.createIssue(summary: summary, description: description, type: type, parent: parent)
     guard let res = result else {
         print("Something went wrong.")
         print("Try to check entered issue type.\nAlso you should be ensure that you entered correct issue type if you want to create subtask.\nYou can list all availables issue types for current project by command `zira issuetypes`")
-        guard let d = data else {
-            exit(0)
-        }
-        print("data:")
-        print("\(String(data: d, encoding: .utf8) ?? "No data")")
         exit(0)
     }
-    print("Success!\nThere was created an issue.\n\n\(Settings.shared.host)browse/\(res.key)\n\n")
+    print("Success!\nThere was created an issue.\n\n\(Settings.shared.host)browse/\(res)\n\n")
     break
 default:
     break

@@ -6,21 +6,22 @@
 //  Copyright © 2018 Zaakk. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 let kTimeoutInterval:TimeInterval = 20.0
 let kAPIVersion = 2
 let kIssueEndpoint = "rest/api/\(kAPIVersion)/issue"
 let kMetaEndpoint = "rest/api/\(kAPIVersion)/issue/createmeta"
+let kIssueStatusesEndpoint = "rest/api/\(kAPIVersion)/status"
+let kEditIssueEndpoint = "rest/api/\(kAPIVersion)/issue/%@/transitions"
 
-
-class Net: NSObject {
+class Net {
     
-    static func createIssue(summary:String, description:String, type:String?, parent:String?) -> (APIResponse?, Data?) {
+    static func createIssue(summary:String, description:String, type:String?, parent:String?) -> String? {
         let url = "\(Settings.shared.host)\(kIssueEndpoint)"
         
         guard let issueType = handleIssueType(type: type, isSubtask: parent != nil) else {
-            return (nil, nil)
+            return nil
         }
         
         var payload:[String:Any] =   [
@@ -43,19 +44,58 @@ class Net: NSObject {
         }
         let (data, _, error) = self.syncLoad(url: url, payload: payload)
         if (error != nil) {
-            return (nil, data)
+            return nil
         }
         guard let responseData = data else {
-            return (nil, nil)
+            return nil
         }
         
         do {
             let result = try JSONDecoder().decode(APIResponse.self, from: responseData)
-            return (result, responseData)
+            return "\(Settings.shared.host)browse/\(result.key)"
         } catch {
-            return (nil, responseData)
+            return nil
+        }
+    }
+    
+    static func editIssue(issue:String, status:String) -> Bool {
+        let url = String(format: "\(Settings.shared.host)\(kEditIssueEndpoint)", issue)
+        
+        guard let newStatusId = handleIssueStatus(status, for: url) else {
+            return false
         }
         
+        let payload:[String:Any] =  [
+                                        "transition": [
+                                            "id": newStatusId
+                                        ]
+                                    ]
+        
+        let (_, response, error) = self.syncLoad(url: url, payload: payload)
+        if (error != nil) {
+            return false
+        }
+        guard let resp = response as? HTTPURLResponse, resp.statusCode == 204 else {
+            return false
+        }
+        return true
+    }
+    
+    static func loadMeta<T:Codable>(_ urlStr:String) -> T? {
+        let (data, error) = get(urlStr)
+        
+        if error != nil {
+            return nil
+        }
+        guard let d = data else {
+            return nil
+        }
+        do {
+            let statuses:T = try JSONDecoder().decode(T.self, from: d)
+            return statuses
+        } catch {
+            return nil
+        }
     }
     
     static func headers() -> [String:String]? {
@@ -75,6 +115,16 @@ class Net: NSObject {
         ]
         
         return headers
+    }
+    
+    private static func get(_ urlStr:String) -> (Data?, Error?) {
+        guard let url = URL(string: urlStr) else {
+            return (nil, nil)
+        }
+        let request = NSMutableURLRequest(url: url)
+        request.allHTTPHeaderFields = self.headers()
+        let (data, _, error) = load(request: request)
+        return (data, error)
     }
     
     static func syncLoad(url:String, payload:[String:Any]) -> (Data?, URLResponse?, Error?) {
@@ -116,28 +166,6 @@ class Net: NSObject {
         return (dataResp, serverResponse, errorResp)
     }
     
-    static func loadProjects() -> Meta? {
-        let urlStr = "\(Settings.shared.host)\(kMetaEndpoint)"
-        guard let url = URL(string: urlStr) else {
-            return nil
-        }
-        let request = NSMutableURLRequest(url: url)
-        request.allHTTPHeaderFields = self.headers()
-        let (data, _, error) = load(request: request)
-        if error != nil {
-            return nil
-        }
-        guard let d = data else {
-            return nil
-        }
-        do {
-            let meta = try JSONDecoder().decode(Meta.self, from: d)
-            return meta
-        } catch {
-            return nil
-        }
-    }
-    
     private static func handleIssueType(type:String?, isSubtask:Bool) -> String? {
         guard let project = Settings.shared.project else {
             return nil
@@ -155,6 +183,18 @@ class Net: NSObject {
             }
         }
         
+        return nil
+    }
+    
+    private static func handleIssueStatus(_ newStatus:String, for url:String) -> String? {
+        guard let issueStatuses:IssueStatuses = loadMeta(url) else {
+            return nil
+        }
+        for status in issueStatuses.transitions {
+            if newStatus == status.name {
+                return status.id
+            }
+        }
         return nil
     }
     
