@@ -11,14 +11,21 @@ import Foundation
 enum Argument:String {
     case install = "install"
     case createIssue = "createIssue"
-    case createSubtask = "createSubtask"
     case issueTypes = "issueTypes"
     case issueStatuses = "issueStatuses"
     case editIssue = "editIssue"
+    case help = "--help"
 }
 
 func help() {
     print("-------------------\nThis is a simple, easy-to-use tool for JIRA.\nThe tool based on JIRA REST API and fully written on Swift\n-------------------")
+    print("There is a list of available arguments and theirs parameters")
+    print("`install` - initiate authorization and setting process. No parameters")
+    print("`createIssue` - creating issue. Parameters: -summary, summary of issue, -description, description of issue, -type, type of issue, make sure you specify the correct type by enter command `issueTypes`, -parent, name of parent issue if you specify this parameter it requires correct issue type. Example:")
+    print("zira createIssue -summary \"Issue's summary\" -description \"Issue's description\" -type Sub-Task -parent \"PROJ-1\"")
+    print("`editIssue` - for now this parameter able to change issue's status. Parameters: -issue, Issue's name like \"PROJ-12\", -status, New status. Pay attention and specify correct status. You can get all available statuses by command `zira issueStatuses`")
+    print("`issueTypes` - output all available issue types")
+    print("`issueStatuses` - output all available issue statuses")
 }
 
 func invalidArguments() {
@@ -123,6 +130,9 @@ case Argument.createIssue.rawValue:
         exit(0)
     }
     print("Success!\nThere was created an issue.\n\n\(Settings.shared.host)browse/\(res)\n\n")
+    break
+case Argument.help.rawValue:
+    help()
     break
 default:
     break
