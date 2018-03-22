@@ -67,7 +67,22 @@ let firstArgument = CommandLine.arguments[1]
 
 switch firstArgument {
 case Argument.install.rawValue:
-    if Settings.shared.install() {
+    var installed = false
+    if CommandLine.arguments.count > 2 {
+        let argumentNames = [kLoginArgKey, kPassArgKey, kHostArgKey, kProjectArgKey]
+        let arguments = argumentsParsing(argumentNames: argumentNames)
+        guard   let user = arguments[kLoginArgKey],
+                let pass = arguments[kPassArgKey],
+                let host = arguments[kHostArgKey],
+                let project = arguments[kProjectArgKey] else {
+                    invalidArguments()
+                    exit(0)
+        }
+        installed = Settings.shared.install(user: user, pass: pass, host: host, project: project)
+    } else {
+        installed = Settings.shared.install()
+    }
+    if installed {
         print("Success!")
     } else {
         print("Something went wrong. I can't  initiate the tool. Try to start 'install' process again.")
@@ -75,7 +90,7 @@ case Argument.install.rawValue:
     break
 case Argument.editIssue.rawValue:
     checkLogin()
-    let argumentNames = [kIssueArgKey, kIssueStatusArgKey]
+    let argumentNames = [kIssueArgKey, kIssueStatusArgKey, kAssignIssueArgKey, kDescriptionArgKey]
     let arguments = argumentsParsing(argumentNames: argumentNames)
     guard   let issue = arguments[kIssueArgKey],
             let status = arguments[kIssueStatusArgKey] else {

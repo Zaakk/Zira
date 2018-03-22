@@ -13,3 +13,8 @@ let kIssueTypeArgKey = "-type"
 let kParentNameArgKey = "-parent"
 let kIssueArgKey = "-issue"
 let kIssueStatusArgKey = "-status"
+let kAssignIssueArgKey = "-assign"
+
+let kLoginArgKey = "-login"
+let kPassArgKey = "-pass"
+let kHostArgKey = "-host"

@@ -11,7 +11,16 @@ import Foundation
 class Settings:Codable {
     static let shared:Settings = Settings()
     
-    var host:String = ""
+    var host:String = "" {
+        didSet {
+            if !host.hasPrefix("http") {
+                host = "http://\(host)"
+            }
+            if !host.hasSuffix("/") {
+                host = "\(host)/"
+            }
+        }
+    }
     var user:String = ""
     var pass:String = ""
     var project:Project?
@@ -62,23 +71,39 @@ class Settings:Codable {
     }
     
     func install() -> Bool {
-        host = userInputFor(message: "Please, enter your JIRA's host:")
-        user = userInputFor(message: "Now, please, enter your jira login:")
-        pass = userInputFor(message: "And password, please:", isPassword: true)
+        let host = userInputFor(message: "Please, enter your JIRA's host:")
+        let user = userInputFor(message: "Now, please, enter your jira login:")
+        let pass = userInputFor(message: "And password, please:", isPassword: true)
         
-        if !host.hasPrefix("http") {
-            host = "http://\(host)"
-        }
-        if !host.hasSuffix("/") {
-            host = "\(host)/"
-        }
+        return install(user: user, pass: pass, host: host, project: nil)
+    }
+        
+    
+    func install(user:String, pass:String, host:String, project:String?) -> Bool {
+        self.user = user
+        self.pass = pass
+        self.host = host
         
         guard let meta:Meta = Net.loadMeta("\(Settings.shared.host)\(kMetaEndpoint)") else {
             logout()
             return false
         }
         
-        self.project = selectProject(projects: meta.projects)
+        if project == nil {
+            self.project = selectProject(projects: meta.projects)
+        } else {
+            for proj in meta.projects {
+                if proj.name == project {
+                    self.project = proj
+                    break
+                }
+            }
+            if self.project == nil {
+                logout()
+                return false
+            }
+        }
+        
         
         guard let loadedStatuses:[Status] = Net.loadMeta("\(Settings.shared.host)\(kIssueStatusesEndpoint)") else {
             return false
@@ -156,7 +181,7 @@ class Settings:Codable {
         }
     }
     
-    private func save() -> Bool {
+    func save() -> Bool {
         do {
             let data = try JSONEncoder().encode(self)
             try data.write(to: self.homeDirURL)
