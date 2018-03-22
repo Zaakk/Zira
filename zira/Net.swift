@@ -13,7 +13,14 @@ let kAPIVersion = 2
 let kIssueEndpoint = "rest/api/\(kAPIVersion)/issue"
 let kMetaEndpoint = "rest/api/\(kAPIVersion)/issue/createmeta"
 let kIssueStatusesEndpoint = "rest/api/\(kAPIVersion)/status"
-let kEditIssueEndpoint = "rest/api/\(kAPIVersion)/issue/%@/transitions"
+let kChangeIssueStatusEndpoint = "rest/api/\(kAPIVersion)/issue/%@/transitions"
+let kEditIssueEndpoint = "rest/api/\(kAPIVersion)/issue/%@/"
+
+enum HTTPMethod:String {
+    case post = "POST"
+    case get = "GET"
+    case put = "PUT"
+}
 
 class Net {
     
@@ -42,7 +49,7 @@ class Net {
             fields["parent"] = ["key": parent!]
             payload["fields"] = fields
         }
-        let (data, _, error) = self.syncLoad(url: url, payload: payload)
+        let (data, _, error) = self.syncLoad(method: .post, url: url, payload: payload)
         if (error != nil) {
             return nil
         }
@@ -58,8 +65,36 @@ class Net {
         }
     }
     
-    static func editIssue(issue:String, status:String) -> Bool {
+    static func editIssue(issue:String, summary:String?, description:String?, assign:String?) -> Bool {
         let url = String(format: "\(Settings.shared.host)\(kEditIssueEndpoint)", issue)
+        
+        var dict:[String:Any] = [:]
+        
+        if summary != nil {
+            dict["summary"] = [["set" : summary!]]
+        }
+        if description != nil {
+            dict["description"] = [["set" : description!]]
+        }
+        if assign != nil {
+            dict["assignee"] = [["set" : [ "name": assign! ] ]]
+        }
+        
+        let payload:[String:Any] = ["update": dict]
+        
+        let (_, response, error) = self.syncLoad(method: .put, url: url, payload: payload)
+        if (error != nil) {
+            return false
+        }
+        guard let resp = response as? HTTPURLResponse, resp.statusCode == 204 else {
+            return false
+        }
+        return true
+        
+    }
+    
+    static func changeIssueStatus(issue:String, status:String) -> Bool {
+        let url = String(format: "\(Settings.shared.host)\(kChangeIssueStatusEndpoint)", issue)
         
         guard let newStatusId = handleIssueStatus(status, for: url) else {
             return false
@@ -71,7 +106,7 @@ class Net {
                                         ]
                                     ]
         
-        let (_, response, error) = self.syncLoad(url: url, payload: payload)
+        let (_, response, error) = self.syncLoad(method: .post, url: url, payload: payload)
         if (error != nil) {
             return false
         }
@@ -127,7 +162,7 @@ class Net {
         return (data, error)
     }
     
-    static func syncLoad(url:String, payload:[String:Any]) -> (Data?, URLResponse?, Error?) {
+    static func syncLoad(method:HTTPMethod, url:String, payload:[String:Any]) -> (Data?, URLResponse?, Error?) {
         guard let url = URL(string: url) else {
             return (nil, nil, nil)
         }
@@ -140,7 +175,7 @@ class Net {
         }
         
         let request = NSMutableURLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: kTimeoutInterval)
-        request.httpMethod = "POST"
+        request.httpMethod = method.rawValue
         request.allHTTPHeaderFields = self.headers()
         request.httpBody = postData
         

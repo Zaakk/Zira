@@ -90,16 +90,24 @@ case Argument.install.rawValue:
     break
 case Argument.editIssue.rawValue:
     checkLogin()
-    let argumentNames = [kIssueArgKey, kIssueStatusArgKey, kAssignIssueArgKey, kDescriptionArgKey]
+    let argumentNames = [kIssueArgKey, kIssueStatusArgKey, kAssignIssueArgKey, kDescriptionArgKey, kSummaryArgKey]
     let arguments = argumentsParsing(argumentNames: argumentNames)
-    guard   let issue = arguments[kIssueArgKey],
-            let status = arguments[kIssueStatusArgKey] else {
+    guard   let issue = arguments[kIssueArgKey] else {
             invalidArguments()
             exit(0)
     }
-    if !Net.editIssue(issue: issue, status: status) {
+    let status = arguments[kIssueStatusArgKey]
+    let summary = arguments[kSummaryArgKey]
+    let assign = arguments[kAssignIssueArgKey]
+    let description = arguments[kDescriptionArgKey]
+    if status != nil && !Net.changeIssueStatus(issue: issue, status: status!) {
         print("Something went wrong.")
-        print("Try to check entered issue type.\nAlso you should be ensure that you entered correct issue type if you want to create subtask.\nYou can list all availables issue types for current project by command `zira issuetypes`")
+        print("Try to check entered issue status.\nYou can list all availables issue statuses for current project by command `zira issueStatuses`")
+        exit(0)
+    }
+    if !Net.editIssue(issue: issue, summary: summary, description: description, assign: assign) {
+        print("Something went wrong.")
+        print("Try to check entered parameters.\nPay attention on username.")
         exit(0)
     }
     print("Success!\nThe issue has been edited\n\n")
