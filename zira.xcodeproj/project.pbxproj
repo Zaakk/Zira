@@ -39,6 +39,7 @@
 		BC014DB4206031A100412EF9 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		BC014DB6206031F700412EF9 /* IssueType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IssueType.swift; sourceTree = "<group>"; };
 		BC014DB82060415200412EF9 /* APIResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIResponse.swift; sourceTree = "<group>"; };
+		BC0CB35B206394A00066FB92 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		BC10362A205BC8BE002B75BE /* zira */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zira; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC10362D205BC8BE002B75BE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		BC103634205BF46B002B75BE /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
@@ -72,6 +73,7 @@
 		BC103621205BC8BE002B75BE = {
 			isa = PBXGroup;
 			children = (
+				BC0CB35B206394A00066FB92 /* README.md */,
 				BC10362C205BC8BE002B75BE /* zira */,
 				BC10362B205BC8BE002B75BE /* Products */,
 			);
