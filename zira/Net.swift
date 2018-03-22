@@ -31,24 +31,23 @@ class Net {
             return nil
         }
         
-        var payload:[String:Any] =   [
-                            "fields": [
-                                "project": [
-                                    "key": Settings.shared.project?.key
-                                ],
-                                "summary": summary,
-                                "description": description,
-                                "issuetype": [
-                                    "name": issueType
+        var dict:[String:Any] = [
+                                    "project": [
+                                        "key": Settings.shared.project?.key
+                                    ],
+                                    "summary": summary,
+                                    "description": description,
+                                    "issuetype": [
+                                        "name": issueType
+                                    ]
                                 ]
-                            ]
-                        ]
         
         if parent != nil {
-            var fields:[String:Any] = payload["fields"] as! [String:Any]
-            fields["parent"] = ["key": parent!]
-            payload["fields"] = fields
+            dict["parent"] = ["key": parent!]
         }
+        
+        let payload:[String:Any] = ["fields": dict]
+        
         let (data, _, error) = self.syncLoad(method: .post, url: url, payload: payload)
         if (error != nil) {
             return nil

@@ -152,7 +152,7 @@ case Argument.createIssue.rawValue:
         print("Try to check entered issue type.\nAlso you should be ensure that you entered correct issue type if you want to create subtask.\nYou can list all availables issue types for current project by command `zira issuetypes`")
         exit(0)
     }
-    print("Success!\nThere was created an issue.\n\n\(Settings.shared.host)browse/\(res)\n\n")
+    print("Success!\nThere was created an issue.\n\n\(res)\n\n")
     break
 case Argument.help.rawValue:
     help()
