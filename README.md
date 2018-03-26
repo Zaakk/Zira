@@ -10,10 +10,10 @@
 #### The following options are available:
 
 * `install` - initiate authorization and setting process. Parameters:
-* -login 'username'
-* -pass 'password'
-* -host 'example.com'
-* -project 'project name'
+  * -login 'username'
+  * -pass 'password'
+  * -host 'example.com'
+  * -project 'project name'
 
 If you won't set any parameter will be initiated interactive logging in process.
 
