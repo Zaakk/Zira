@@ -65,6 +65,28 @@ if CommandLine.arguments.count == 1 {
 
 let firstArgument = CommandLine.arguments[1]
 
+let argumentNames = [kLoginArgKey, kPassArgKey, kHostArgKey, kProjectArgKey]
+let arguments = argumentsParsing(argumentNames: argumentNames)
+if  arguments[kLoginArgKey] != nil &&
+    arguments[kPassArgKey] != nil &&
+    arguments[kHostArgKey] != nil {
+    
+    let login = arguments[kLoginArgKey]!
+    let pass = arguments[kPassArgKey]!
+    let host = arguments[kHostArgKey]!
+    Settings.shared.user = login
+    Settings.shared.pass = pass
+    Settings.shared.host = host
+}
+
+if arguments[kProjectArgKey] != nil {
+    let project = arguments[kProjectArgKey]
+    if !Settings.shared.setProjectName(name: project) {
+        print("You entered incorrect project name. Please make sure that you entered correct project name.")
+        exit(0)
+    }
+}
+
 switch firstArgument {
 case Argument.install.rawValue:
     var installed = false

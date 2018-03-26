@@ -84,26 +84,9 @@ class Settings:Codable {
         self.pass = pass
         self.host = host
         
-        guard let meta:Meta = Net.loadMeta("\(Settings.shared.host)\(kMetaEndpoint)") else {
-            logout()
+        if !setProjectName(name: project) {
             return false
         }
-        
-        if project == nil {
-            self.project = selectProject(projects: meta.projects)
-        } else {
-            for proj in meta.projects {
-                if proj.name == project {
-                    self.project = proj
-                    break
-                }
-            }
-            if self.project == nil {
-                logout()
-                return false
-            }
-        }
-        
         
         guard let loadedStatuses:[Status] = Net.loadMeta("\(Settings.shared.host)\(kIssueStatusesEndpoint)") else {
             return false
@@ -117,6 +100,30 @@ class Settings:Codable {
         }
         
         return save()
+    }
+    
+    func setProjectName(name:String?) -> Bool {
+        guard let meta:Meta = Net.loadMeta("\(Settings.shared.host)\(kMetaEndpoint)") else {
+            logout()
+            return false
+        }
+        
+        if name == nil {
+            self.project = selectProject(projects: meta.projects)
+            return true
+        }
+        
+        for proj in meta.projects {
+            if proj.name == name {
+                self.project = proj
+                return true
+            }
+        }
+        if self.project == nil {
+            logout()
+            return false
+        }
+        return true
     }
     
     func logout() {

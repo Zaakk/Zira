@@ -202,7 +202,7 @@ class Net {
     
     private static func handleIssueType(type:String?, isSubtask:Bool) -> String? {
         guard let project = Settings.shared.project else {
-            return nil
+            return type
         }
         
         let issueTypes:[IssueType] = project.issuetypes
