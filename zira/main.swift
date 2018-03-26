@@ -10,10 +10,10 @@ import Foundation
 
 enum Argument:String {
     case install = "install"
-    case createIssue = "createIssue"
+    case create = "create"
     case issueTypes = "issueTypes"
     case issueStatuses = "issueStatuses"
-    case editIssue = "editIssue"
+    case edit = "edit"
     case help = "--help"
 }
 
@@ -88,7 +88,7 @@ case Argument.install.rawValue:
         print("Something went wrong. I can't  initiate the tool. Try to start 'install' process again.")
     }
     break
-case Argument.editIssue.rawValue:
+case Argument.edit.rawValue:
     checkLogin()
     let argumentNames = [kIssueArgKey, kIssueStatusArgKey, kAssignIssueArgKey, kDescriptionArgKey, kSummaryArgKey]
     let arguments = argumentsParsing(argumentNames: argumentNames)
@@ -135,7 +135,7 @@ case Argument.issueTypes.rawValue:
         print(" – Name: `\(issueType.name)` is it subtask type: \(issueType.subtask ? "yes" : "no")")
     }
     break
-case Argument.createIssue.rawValue:
+case Argument.create.rawValue:
     checkLogin()
     let argumentNames = [kSummaryArgKey, kDescriptionArgKey, kIssueTypeArgKey, kParentNameArgKey]
     let arguments = argumentsParsing(argumentNames: argumentNames)
